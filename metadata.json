@@ -1,0 +1,8 @@
+{
+  "name": "Ai Menu - Productivity & AI Excellence",
+  "description": "A premium productivity platform featuring AI-driven content generation, a vast marketplace, and elite tools for the modern creator. Built with a black, white, and gold aesthetic.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
