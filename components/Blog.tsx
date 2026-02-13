@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Share2, Plus, Clock, ChevronLeft, ChevronRight, User, Send, X, Activity, Globe, Zap } from 'lucide-react';
+import { Share2, Plus, Clock, ChevronLeft, ChevronRight, User, Send, X, Activity, Globe, Zap, Check } from 'lucide-react';
 import { Post } from '../types';
 import { generateBlogContent } from '../services/geminiService';
 
@@ -30,68 +30,54 @@ const Blog: React.FC = () => {
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [isAiBroadcasting, setIsAiBroadcasting] = useState(false);
+  const [justShared, setJustShared] = useState<string | null>(null);
   const maxPages = 364494774;
 
+  // Persistence and URL-Sync Logic
   useEffect(() => {
     const saved = localStorage.getItem('ai_menu_articles');
-    if (saved) {
+    let basePosts = saved ? JSON.parse(saved) : INITIAL_POSTS;
+
+    // Check for shared article in URL (Cross-device sync)
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('shared');
+    
+    if (sharedData) {
       try {
-        setPosts(JSON.parse(saved));
+        const decoded = JSON.parse(atob(sharedData));
+        // Add to current session and save if not duplicate
+        if (!basePosts.find((p: Post) => p.id === decoded.id)) {
+          basePosts = [decoded, ...basePosts];
+          localStorage.setItem('ai_menu_articles', JSON.stringify(basePosts));
+          // Clean URL without refresh
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       } catch (e) {
-        setPosts(INITIAL_POSTS);
+        console.error("Invalid share data", e);
       }
-    } else {
-      setPosts(INITIAL_POSTS);
     }
+    
+    setPosts(basePosts);
   }, []);
 
+  // Sync back to local storage
   useEffect(() => {
     if (posts.length > 0) {
       localStorage.setItem('ai_menu_articles', JSON.stringify(posts));
     }
   }, [posts]);
 
-  useEffect(() => {
-    const generateAiPost = async () => {
-      setIsAiBroadcasting(true);
-      const topics = ['Neural Productivity', 'Chain of Thought', 'AGI Scaling', 'Deep Learning Mindsets'];
-      const topic = topics[Math.floor(Math.random() * topics.length)];
-      
-      try {
-        const generated = await generateBlogContent(topic);
-        const aiPost: Post = {
-          id: `ai-${Date.now()}`,
-          title: generated.title,
-          content: generated.content,
-          author: `AGI Agent ${Math.floor(Math.random() * 999)}`,
-          timestamp: Date.now(),
-          tags: ['AI-Native', 'Real-time'],
-          imageUrl: `https://picsum.photos/seed/${Math.random()}/800/400?grayscale`
-        };
-        
-        setPosts(prev => [aiPost, ...prev].slice(0, 100));
-      } catch (e) {
-        console.error("AI Generation failed", e);
-      } finally {
-        setTimeout(() => setIsAiBroadcasting(false), 3000);
-      }
-    };
-
-    const interval = setInterval(generateAiPost, 120000); // AI adds a post every 2 mins for activity
-    return () => clearInterval(interval);
-  }, []);
-
   const handleManualPost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.title || !newPost.content) return;
 
     const userPost: Post = {
-      id: Date.now().toString(),
+      id: `usr-${Date.now()}`,
       title: newPost.title,
       content: newPost.content,
       author: 'Master User',
       timestamp: Date.now(),
-      tags: ['Community'],
+      tags: ['Community', 'Manual'],
       imageUrl: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=800'
     };
 
@@ -101,18 +87,21 @@ const Blog: React.FC = () => {
   };
 
   const shareArticle = async (post: Post) => {
-    const shareData = {
-      title: post.title,
-      text: `Check out "${post.title}" on Ai Menu.`,
-      url: window.location.origin + window.location.pathname,
-    };
+    // Universal sync via URL encoding
+    const serialized = btoa(JSON.stringify(post));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?shared=${serialized}`;
 
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: post.title,
+          text: `Check out this neural breakthrough on Ai Menu!`,
+          url: shareUrl,
+        });
       } else {
-        await navigator.clipboard.writeText(`${post.title} - ${shareData.url}`);
-        alert('Link copied to clipboard for sharing!');
+        await navigator.clipboard.writeText(shareUrl);
+        setJustShared(post.id);
+        setTimeout(() => setJustShared(null), 3000);
       }
     } catch (err) {
       console.error('Sharing failed:', err);
@@ -124,29 +113,30 @@ const Blog: React.FC = () => {
       <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-16 border-b border-white/10 pb-12">
         <div className="text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-4 mb-3">
-            <h1 className="text-5xl font-serif font-bold gold-gradient tracking-tight">AI AGI Feed</h1>
+            <h1 className="text-5xl font-serif font-bold gold-gradient tracking-tight">AGI Feed</h1>
             {isAiBroadcasting && (
               <div className="flex items-center gap-2 px-3 py-1 bg-gold-500 text-black rounded-full text-[10px] font-bold animate-pulse">
-                <Activity size={12} className="animate-spin" /> GENERATING...
+                <Activity size={12} className="animate-spin" /> BROADCASTING
               </div>
             )}
           </div>
           <p className="text-gray-500 font-light max-w-md leading-relaxed">
-            Real-time intelligence broadcasting every few minutes from our neural nodes.
+            Neural insights generated by AGI agents and community masterminds.
           </p>
         </div>
         
         <button 
           onClick={() => setIsPosting(!isPosting)}
-          className="flex items-center gap-3 bg-gold-500 text-black px-8 py-4 rounded-lg font-bold hover:bg-gold-400 hover:scale-105 transition-all uppercase text-xs tracking-[0.2em] shadow-lg shadow-gold-500/20"
+          className="group flex items-center gap-3 bg-gold-500 text-black px-8 py-4 rounded-lg font-bold hover:bg-gold-400 hover:scale-105 transition-all uppercase text-xs tracking-[0.2em] shadow-lg shadow-gold-500/20"
         >
-          {isPosting ? <X size={20} /> : <Plus size={20} />} {isPosting ? 'Cancel' : 'New Article'}
+          {isPosting ? <X size={20} /> : <Plus size={20} className="group-hover:rotate-90 transition-transform" />} 
+          {isPosting ? 'Cancel' : 'Post Article'}
         </button>
       </div>
 
       {isPosting && (
         <form onSubmit={handleManualPost} className="mb-20 p-10 border border-gold-500/30 bg-neutral-950 rounded-2xl animate-in slide-in-from-top-6 duration-500 shadow-2xl">
-          <h3 className="text-2xl font-serif mb-8 text-white italic">Post Permanent Content</h3>
+          <h3 className="text-2xl font-serif mb-8 text-white italic">Neural Broadcast System</h3>
           <div className="space-y-8">
             <input 
               type="text" 
@@ -157,7 +147,7 @@ const Blog: React.FC = () => {
               required
             />
             <textarea 
-              placeholder="Describe your breakthrough..." 
+              placeholder="Describe your breakthrough with clarity and logic..." 
               className="w-full bg-neutral-900/50 border border-white/10 p-8 min-h-[300px] outline-none focus:border-gold-500 transition-all rounded-xl text-gray-300 font-light text-lg leading-relaxed resize-none"
               value={newPost.content}
               onChange={e => setNewPost({...newPost, content: e.target.value})}
@@ -181,17 +171,17 @@ const Blog: React.FC = () => {
                 className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" 
                 alt={post.title} 
               />
-              <div className="absolute bottom-6 left-6 flex gap-2">
+              <div className="absolute top-4 left-4 flex gap-2">
                 {post.tags.map(tag => (
-                  <span key={tag} className="px-4 py-1.5 bg-gold-500/90 backdrop-blur-md text-black text-[9px] font-black uppercase tracking-[0.2em] rounded-full">{tag}</span>
+                  <span key={tag} className="px-3 py-1 bg-black/80 backdrop-blur-md text-gold-500 text-[8px] font-black uppercase tracking-[0.2em] rounded border border-white/10">{tag}</span>
                 ))}
               </div>
             </div>
             
             <div className="lg:col-span-7 space-y-8">
-              <div className="flex items-center gap-6 text-[11px] text-gray-500 uppercase tracking-[0.3em]">
-                <span className="flex items-center gap-2 text-gold-500 font-bold"><User size={16} /> {post.author}</span>
-                <span className="flex items-center gap-2"><Clock size={16} /> {new Date(post.timestamp).toLocaleTimeString()}</span>
+              <div className="flex items-center gap-6 text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold">
+                <span className="flex items-center gap-2 text-gold-500"><User size={14} /> {post.author}</span>
+                <span className="flex items-center gap-2"><Clock size={14} /> {new Date(post.timestamp).toLocaleDateString()}</span>
               </div>
               
               <h2 className="text-4xl font-serif font-bold text-white group-hover:text-gold-500 transition-colors leading-tight">
@@ -203,14 +193,17 @@ const Blog: React.FC = () => {
               </p>
               
               <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                <button className="text-white border-b-2 border-gold-500/30 pb-1 font-bold uppercase tracking-widest text-[10px] flex items-center gap-3 hover:text-gold-500 hover:border-gold-500 transition-all">
-                  Read Analysis <ChevronRight size={18} />
+                <button className="text-white border-b border-gold-500/50 pb-1 font-bold uppercase tracking-widest text-[9px] flex items-center gap-2 hover:text-gold-500 hover:border-gold-500 transition-all">
+                  Read More <ChevronRight size={14} />
                 </button>
                 <button 
                   onClick={() => shareArticle(post)}
-                  className="flex items-center gap-2 text-gray-500 hover:text-gold-500 transition-all uppercase text-[10px] tracking-widest font-black"
+                  className={`flex items-center gap-2 transition-all uppercase text-[10px] tracking-widest font-black ${
+                    justShared === post.id ? 'text-green-500' : 'text-gray-500 hover:text-gold-500'
+                  }`}
                 >
-                  <Share2 size={20} /> Share
+                  {justShared === post.id ? <Check size={18} /> : <Share2 size={18} />}
+                  {justShared === post.id ? 'Link Copied' : 'Share Universal Link'}
                 </button>
               </div>
             </div>
@@ -228,7 +221,7 @@ const Blog: React.FC = () => {
             <ChevronLeft size={32} />
           </button>
           <div className="text-center px-12">
-            <span className="text-[11px] uppercase tracking-[0.6em] text-gray-700 mb-4 block">Neural Segment</span>
+            <span className="text-[11px] uppercase tracking-[0.6em] text-gray-700 mb-4 block font-bold">Neural Segment</span>
             <div className="text-4xl font-serif font-bold flex items-center justify-center gap-4">
               <span className="gold-gradient">{currentPage.toLocaleString()}</span>
               <span className="text-gray-800 text-lg">/ {maxPages.toLocaleString()}</span>
@@ -236,13 +229,13 @@ const Blog: React.FC = () => {
           </div>
           <button 
             onClick={() => { setCurrentPage(prev => prev + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="w-16 h-16 border-2 border-white/10 rounded-full flex items-center justify-center hover:border-gold-500 text-white transition-all bg-neutral-950"
+            className="w-16 h-16 border-2 border-white/10 rounded-full flex items-center justify-center hover:border-gold-500 text-white transition-all bg-neutral-950 shadow-lg shadow-gold-500/5"
           >
             <ChevronRight size={32} />
           </button>
         </div>
-        <p className="text-[10px] text-gray-600 uppercase tracking-[0.5em] flex items-center gap-3">
-          <Globe size={14} /> Global Broadcast Active • Page {currentPage}
+        <p className="text-[10px] text-gray-600 uppercase tracking-[0.5em] flex items-center gap-3 font-bold">
+          <Globe size={14} /> Decentralized Network Layer • Node {Math.floor(Math.random() * 999)} Active
         </p>
       </div>
     </div>
