@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { CheckCircle2, Star, ShieldCheck, Zap, Download } from 'lucide-react';
+import { CheckCircle2, Star, ShieldCheck, Zap, Download, Brain, Rocket } from 'lucide-react';
 
 const Store: React.FC = () => {
+  const STRIPE_LINK = "https://buy.stripe.com/test_eVq5kCfUW55C0LXduf4ZG00";
+
   return (
     <div className="py-24 animate-in fade-in duration-700">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -54,9 +56,14 @@ const Store: React.FC = () => {
           </div>
 
           <div className="pt-8 space-y-4">
-            <button className="w-full bg-gold-500 text-black py-5 rounded font-bold uppercase tracking-[0.2em] text-lg hover:bg-gold-400 transition-all shadow-xl shadow-gold-500/10 flex items-center justify-center gap-3">
+            <a 
+              href={STRIPE_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-gold-500 text-black py-5 rounded font-bold uppercase tracking-[0.2em] text-lg hover:bg-gold-400 transition-all shadow-xl shadow-gold-500/10 flex items-center justify-center gap-3"
+            >
               Purchase for $29.99 <Download size={24} />
-            </button>
+            </a>
             <p className="text-center text-xs text-gray-600 flex items-center justify-center gap-2">
               <ShieldCheck size={14} /> Secure Transaction • Instant PDF Download • 30-Day Guarantee
             </p>
@@ -72,7 +79,5 @@ const Store: React.FC = () => {
     </div>
   );
 };
-
-import { Brain, Rocket } from 'lucide-react';
 
 export default Store;

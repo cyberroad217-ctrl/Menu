@@ -60,7 +60,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
                 key={item.value}
                 onClick={() => handleNav(item.value)}
                 className={`text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:text-gold-500 relative py-2 ${
-                  currentPage === item.value ? 'text-gold-500' : 'text-gray-400'
+                  currentPage === item.value ? 'text-gold-500 underline underline-offset-8' : 'text-gray-400'
                 }`}
               >
                 {item.label}
@@ -77,14 +77,14 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
             {isMenuOpen ? (
               <X size={32} className="text-gold-500 animate-in zoom-in duration-300" />
             ) : (
-              <div className="flex flex-col items-end gap-1.5">
-                <span className="w-10 h-0.5 bg-gold-500 block group-hover:w-6 transition-all duration-500"></span>
-                <span className="w-7 h-0.5 bg-white block group-hover:w-10 transition-all duration-500"></span>
-                <span className="w-4 h-0.5 bg-gold-500 block group-hover:w-8 transition-all duration-500"></span>
+              <div className="flex flex-col items-end gap-1.5 scale-110">
+                <span className="w-10 h-1 bg-gold-500 block group-hover:w-6 transition-all duration-500 shadow-[0_0_10px_rgba(212,175,55,0.5)]"></span>
+                <span className="w-7 h-1 bg-white block group-hover:w-10 transition-all duration-500"></span>
+                <span className="w-10 h-1 bg-gold-500 block group-hover:w-8 transition-all duration-500 shadow-[0_0_10px_rgba(212,175,55,0.5)]"></span>
               </div>
             )}
-            <span className="absolute -bottom-2 text-[6px] text-gold-500 uppercase tracking-[0.4em] font-black opacity-0 group-hover:opacity-100 transition-opacity">
-              {isMenuOpen ? 'CLOSE' : 'CONSOLE'}
+            <span className="absolute -bottom-2 text-[7px] text-gold-500 uppercase tracking-[0.5em] font-black opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              {isMenuOpen ? 'CLOSE' : 'OPEN MENU'}
             </span>
           </button>
         </div>
@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
       {/* Full-Screen Console Menu Overlay */}
       <div 
         className={`fixed inset-0 z-[95] bg-black transition-all duration-1000 cubic-bezier(0.77, 0, 0.175, 1) flex items-center justify-center ${
-          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none translate-y-full'
+          isMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-full pointer-events-none'
         }`}
       >
         <div className="absolute inset-0 opacity-10 pointer-events-none">

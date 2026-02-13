@@ -7,6 +7,7 @@ const Marketplace: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const STRIPE_LINK = "https://buy.stripe.com/test_eVq5kCfUW55C0LXduf4ZG00";
   const maxPages = 54883237565;
 
   // Simulated massive product database generation based on page
@@ -115,12 +116,15 @@ const Marketplace: React.FC = () => {
                 alt={product.name} 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-              <button 
+              <a 
+                href={STRIPE_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => addToMemory(product)}
                 className="absolute bottom-6 right-6 p-4 bg-gold-500 text-black rounded-full shadow-2xl opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-white"
               >
                 <ShoppingCart size={24} />
-              </button>
+              </a>
               <div className="absolute top-6 left-6">
                 <span className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-[9px] uppercase tracking-widest text-gold-500 font-bold">
                   {product.category}
@@ -140,9 +144,14 @@ const Marketplace: React.FC = () => {
               
               <div className="flex items-center justify-between pt-6 border-t border-white/5">
                 <span className="text-2xl font-serif font-bold text-white">${product.price.toFixed(2)}</span>
-                <button className="flex items-center gap-2 px-6 py-2 bg-white text-black text-[10px] font-black uppercase rounded-full hover:bg-gold-500 transition-all">
+                <a 
+                  href={STRIPE_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-6 py-2 bg-white text-black text-[10px] font-black uppercase rounded-full hover:bg-gold-500 transition-all"
+                >
                   Acquire <Zap size={14} />
-                </button>
+                </a>
               </div>
             </div>
           </div>
