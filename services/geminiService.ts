@@ -1,10 +1,11 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 
-// Always create a new GoogleGenAI instance right before making an API call to ensure it always uses the most up-to-date configuration.
 export const generateImage = async (prompt: string): Promise<string | null> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = process.env.API_KEY || '';
+    if (!apiKey) console.warn("Gemini API Key missing. Image generation will fail.");
+    
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: {
@@ -24,17 +25,18 @@ export const generateImage = async (prompt: string): Promise<string | null> => {
     }
     return null;
   } catch (error) {
-    console.error("Image generation failed:", error);
+    console.error("AI Image generation failed:", error);
     return null;
   }
 };
 
 export const generateBlogContent = async (topic: string): Promise<{ title: string; content: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = process.env.API_KEY || '';
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Generate a high-level productivity blog post about ${topic}. Use deep learning concepts.`,
+      contents: `Generate a high-level productivity blog post about ${topic}. Focus on deep learning and neural efficiency.`,
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -42,11 +44,11 @@ export const generateBlogContent = async (topic: string): Promise<{ title: strin
           properties: {
             title: {
               type: Type.STRING,
-              description: "A compelling title for the productivity blog post.",
+              description: "Catchy title for the blog post.",
             },
             content: {
               type: Type.STRING,
-              description: "The body content of the blog post, focusing on deep learning and productivity.",
+              description: "The core article text.",
             }
           },
           required: ["title", "content"]
@@ -54,10 +56,13 @@ export const generateBlogContent = async (topic: string): Promise<{ title: strin
       }
     });
     
-    const text = response.text;
-    return text ? JSON.parse(text) : { title: "AI Innovation", content: "The future is here." };
+    const text = response.text || '{}';
+    return JSON.parse(text);
   } catch (error) {
-    console.error("Blog content generation failed:", error);
-    return { title: "The Deep Learning Shift", content: "Artificial General Intelligence is revolutionizing how we approach productivity through Chain of Thought algorithms." };
+    console.error("AI Blog generation failed:", error);
+    return { 
+      title: "The Neural Productivity Shift", 
+      content: "Exploring how Large Language Models are redefining the boundaries of human cognitive output through automated reasoning." 
+    };
   }
 };
