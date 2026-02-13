@@ -11,6 +11,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const PROTOCOL_URL = "https://productivityprotocol.netlify.app";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -141,9 +142,14 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
               <Instagram className="w-5 h-5 hover:text-gold-500 cursor-pointer" />
               <Linkedin className="w-5 h-5 hover:text-gold-500 cursor-pointer" />
             </div>
-            <div className="flex items-center gap-2 group cursor-pointer hover:text-gold-500 transition-colors">
+            <a 
+              href={PROTOCOL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 group cursor-pointer hover:text-gold-500 transition-colors"
+            >
               Access Private Protocol <ArrowUpRight size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -179,7 +185,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
             <ul className="space-y-6 text-gray-500 text-[9px] uppercase tracking-[0.2em] font-black">
               <li className="hover:text-gold-500 cursor-pointer">Encryption Support</li>
               <li className="hover:text-gold-500 cursor-pointer">AGI Roadmap</li>
-              <li className="hover:text-gold-500 cursor-pointer">Privacy Cipher</li>
+              <li><a href={PROTOCOL_URL} target="_blank" rel="noopener noreferrer" className="hover:text-gold-500 cursor-pointer">Protocol Hub</a></li>
             </ul>
           </div>
 
@@ -197,7 +203,10 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, setPage }) => {
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             SYSTEMS NOMINAL • AI MENU v5.0
           </div>
-          <span>&copy; {new Date().getFullYear()} AI MENU • ALL RIGHTS RESERVED</span>
+          <div className="flex items-center gap-4">
+            <a href={PROTOCOL_URL} target="_blank" rel="noopener noreferrer" className="hover:text-gold-500 transition-colors">PROTOCOL NODE</a>
+            <span>&copy; {new Date().getFullYear()} AI MENU • ALL RIGHTS RESERVED</span>
+          </div>
         </div>
       </footer>
     </div>

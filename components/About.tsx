@@ -1,7 +1,8 @@
-
 import React from 'react';
 
 const About: React.FC = () => {
+  const PROTOCOL_URL = "https://productivityprotocol.netlify.app";
+
   return (
     <div className="py-24 max-w-4xl mx-auto px-4">
       <div className="text-center mb-16">
@@ -18,6 +19,11 @@ const About: React.FC = () => {
         <h2 className="text-3xl font-serif font-bold text-white pt-8 border-t border-white/5">The Faceless Brand</h2>
         <p>
           We operate as a faceless entity because we believe the message is more important than the messenger. Our value lies in the results our systems provide to thousands of creators globally. By removing the ego, we focus entirely on the engineering of AGI-driven workflows.
+        </p>
+
+        <h2 className="text-3xl font-serif font-bold text-white pt-8 border-t border-white/5">The Productivity Protocol</h2>
+        <p>
+          As part of our commitment to universal cognitive output, we synchronize our efforts with the <a href={PROTOCOL_URL} target="_blank" rel="noopener noreferrer" className="text-gold-500 hover:underline font-bold">Productivity Protocol Hub</a>. This central node serves as the primary intelligence repository for our decentralized network, ensuring that all neural assets are optimized for maximum human-machine synergy.
         </p>
 
         <h2 className="text-3xl font-serif font-bold text-white pt-8 border-t border-white/5">Deep Learning Heritage</h2>
