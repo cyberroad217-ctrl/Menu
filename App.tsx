@@ -1,12 +1,11 @@
-
 import React, { useState } from 'react';
-import Layout from './components/Layout';
-import Home from './components/Home';
-import Blog from './components/Blog';
-import Marketplace from './components/Marketplace';
-import Store from './components/Store';
-import About from './components/About';
-import { Page } from './types';
+import Layout from './components/Layout.tsx';
+import Home from './components/Home.tsx';
+import Blog from './components/Blog.tsx';
+import Marketplace from './components/Marketplace.tsx';
+import Store from './components/Store.tsx';
+import About from './components/About.tsx';
+import { Page } from './types.ts';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
